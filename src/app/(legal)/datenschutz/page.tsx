@@ -57,10 +57,13 @@ export default function DatenschutzPage() {
 
       <h2>Hosting</h2>
       <p>
-        Die Website läuft auf einem gemieteten Server. Der Hoster verarbeitet die oben genannten Daten in unserem
-        Auftrag (Auftragsverarbeitung nach Art. 28 DSGVO).
+        Die Website läuft auf einem gemieteten Server der netcup GmbH, Emmy-Noether-Straße 10, 76131 Karlsruhe,
+        Deutschland. netcup verarbeitet die oben genannten Daten in unserem Auftrag (Auftragsverarbeitung nach Art. 28
+        DSGVO). Der Server steht in der EU.
       </p>
-      <span className="todo">TODO: Name, Anschrift und Serverstandort des Hosters eintragen; AV-Vertrag abschließen.</span>
+      <span className="todo">
+        TODO: Serverstandort prüfen (netcup-Kundenbereich) und AV-Vertrag im netcup-Kundenbereich (CCP) abschließen.
+      </span>
 
       <h2>Speicher im Browser (localStorage)</h2>
       <p>
