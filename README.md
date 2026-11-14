@@ -170,7 +170,8 @@ schon 80/443 belegt, leitet `napfdeal.com` dorthin weiter:
 | Vorhandener Proxy | Vorlage                         |
 |-------------------|---------------------------------|
 | nginx             | `deploy/nginx-napfdeal.conf` (+ `certbot --nginx`) |
-| Caddy             | `deploy/Caddyfile.snippet`      |
+| Caddy (direkt installiert) | `deploy/Caddyfile.snippet` |
+| Caddy/nginx **in Docker** | `compose.edge.yaml` + in `.env` `COMPOSE_FILE=compose.yaml:compose.edge.yaml` und `EDGE_NETWORK=<Netzwerk des Proxys>`; im Proxy `reverse_proxy napfdeal-web:3000` |
 
 Belegt nichts die Ports 80/443, kann napfdeal seinen eigenen Caddy mitbringen: in `.env`
 `COMPOSE_PROFILES=caddy` setzen.

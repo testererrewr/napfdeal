@@ -1,0 +1,18 @@
+# Override for a server whose 80/443 belong to a reverse proxy running in Docker (e.g. a shared Caddy).
+# The web container joins that proxy's network, so the proxy reaches it as  napfdeal-web:3000.
+# Nothing else of the proxy changes; other sites on it are not affected.
+#
+# Enable in .env:
+#   COMPOSE_FILE=compose.yaml:compose.edge.yaml
+#   EDGE_NETWORK=<name of the proxy's docker network>
+services:
+  web:
+    networks:
+      internal: {}
+      edge:
+        aliases: [napfdeal-web]
+
+networks:
+  edge:
+    external: true
+    name: ${EDGE_NETWORK:?set EDGE_NETWORK in .env}
