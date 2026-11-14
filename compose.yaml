@@ -1,0 +1,80 @@
+# napfdeal production stack.
+# On the server: /opt/napfdeal  →  docker compose pull && docker compose up -d
+name: napfdeal
+
+x-app: &app
+  env_file: .env
+  restart: unless-stopped
+  networks: [internal]
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    shm_size: 256mb
+
+  migrate:
+    <<: *app
+    image: ${IMAGE_PREFIX}/worker:${IMAGE_TAG:-latest}
+    command: ["node", "dist/worker/migrate.mjs"]
+    restart: "no"
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  worker:
+    <<: *app
+    image: ${IMAGE_PREFIX}/worker:${IMAGE_TAG:-latest}
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  web:
+    <<: *app
+    image: ${IMAGE_PREFIX}/web:${IMAGE_TAG:-latest}
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+    depends_on: [web]
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:

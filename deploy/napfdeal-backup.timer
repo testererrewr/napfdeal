@@ -1,0 +1,12 @@
+# /etc/systemd/system/napfdeal-backup.timer
+# Daily at 03:15 (server time), with up to 10 min random delay.
+[Unit]
+Description=Daily napfdeal backup
+
+[Timer]
+OnCalendar=*-*-* 03:15:00
+RandomizedDelaySec=600
+Persistent=true
+
+[Install]
+WantedBy=timers.target

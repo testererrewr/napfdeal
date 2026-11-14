@@ -1,0 +1,10 @@
+# /etc/systemd/system/napfdeal-backup.service
+[Unit]
+Description=napfdeal encrypted database backup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/napfdeal
+ExecStart=/opt/napfdeal/scripts/backup.sh

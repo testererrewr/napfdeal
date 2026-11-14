@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+/* Design tokens – see docs/design-system.md */
+@theme {
+  --color-paper: #f7f1e6;
+  --color-paper-deep: #efe4d0;
+  --color-ink: #1f1a17;
+  --color-ink-soft: #5a4f47;
+  --color-line: #cdbea4;
+  --color-terracotta: #a9492a;
+  --color-terracotta-soft: #e9c9b6;
+  --color-moss: #4a6636;
+  --color-moss-soft: #d5dfc6;
+  --color-mustard: #c79a2e;
+  --color-mustard-soft: #f0dfae;
+  --color-alarm: #a12820;
+
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-source-sans), system-ui, sans-serif;
+  --font-hand: var(--font-caveat), "Comic Sans MS", cursive;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-variation-settings: "SOFT" 50;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+  }
+
+  a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-terracotta);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-terracotta-soft);
+  }
+}
+
+@layer components {
+  /* Section kicker like a newspaper rubric */
+  .kicker {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Receipt-style dashed rule */
+  .receipt-rule {
+    border: 0;
+    border-top: 1.5px dashed var(--color-line);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .hand {
+    font-family: var(--font-hand);
+    font-weight: 500;
+    line-height: 1.1;
+  }
+
+  /* Legal / long-form text */
+  .prose-napf {
+    max-width: 42rem;
+  }
+  .prose-napf h2 {
+    font-size: 1.5rem;
+    margin-top: 2.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .prose-napf h3 {
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  .prose-napf p,
+  .prose-napf ul {
+    margin-top: 0.75rem;
+  }
+  .prose-napf ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+  .prose-napf a {
+    color: var(--color-terracotta);
+    text-decoration: underline;
+  }
+  .prose-napf .todo {
+    display: block;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-mustard-soft);
+    border-left: 3px solid var(--color-mustard);
+    font-size: 0.9rem;
+  }
+}

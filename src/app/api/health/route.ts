@@ -1,0 +1,13 @@
+import { getSql } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
+
+/** Liveness + database check for monitoring. Returns no internal details. */
+export async function GET() {
+  try {
+    await getSql()`select 1`;
+    return Response.json({ ok: true, db: "ok" }, { headers: { "Cache-Control": "no-store" } });
+  } catch {
+    return Response.json({ ok: false, db: "unreachable" }, { status: 503, headers: { "Cache-Control": "no-store" } });
+  }
+}

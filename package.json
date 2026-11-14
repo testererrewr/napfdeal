@@ -1,0 +1,39 @@
+{
+  "name": "napfdeal",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Price comparison and price alerts for pet supplies in Germany and Austria",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:worker": "esbuild src/worker/index.ts src/worker/migrate.ts --bundle --platform=node --target=node22 --format=esm --packages=external --outdir=dist/worker --out-extension:.js=.mjs",
+    "start": "next start",
+    "worker:dev": "tsx watch src/worker/index.ts",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/worker/migrate.ts",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.0",
+    "next": "^15.5.0",
+    "pg-boss": "^10.1.0",
+    "postgres": "^3.4.5",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "drizzle-kit": "^0.31.0",
+    "esbuild": "^0.25.0",
+    "tailwindcss": "^4.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
+}
