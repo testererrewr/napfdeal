@@ -123,13 +123,11 @@ cat /root/.ssh/napfdeal_deploy.pub
 Den ausgegebenen Schlüssel auf GitHub unter **Repo → Settings → Deploy keys → Add deploy key** eintragen
 („Allow write access“ **nicht** anhaken).
 
+Eigener Host-Alias, damit sich der Schlüssel nicht mit Deploy-Keys anderer Projekte auf dem Server beißt:
+
 ```bash
-cat >> /root/.ssh/config <<'EOF'
-Host github.com
-  IdentityFile /root/.ssh/napfdeal_deploy
-  IdentitiesOnly yes
-EOF
-git clone git@github.com:DEIN-GITHUB-NAME/napfdeal.git /opt/napfdeal
+printf '\nHost github-napfdeal\n  HostName github.com\n  User git\n  IdentityFile /root/.ssh/napfdeal_deploy\n  IdentitiesOnly yes\n' >> /root/.ssh/config
+git clone git@github-napfdeal:DEIN-GITHUB-NAME/napfdeal.git /opt/napfdeal
 ```
 
 ### 3.4 Zugriff auf die privaten Images
