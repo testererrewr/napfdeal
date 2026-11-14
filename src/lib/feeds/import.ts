@@ -149,6 +149,7 @@ async function insertProductWithUniqueSlug(values: Omit<typeof product.$inferIns
 }
 
 type Ctx = {
+  isTest: boolean;
   categoryIds: Map<string, number>;
   productSizes: Map<number, ProductSize>;
   summary: ImportSummary;
@@ -186,6 +187,7 @@ async function createProduct(o: NormalizedOffer, gtins: string[], parsedPack: Pa
       categoryId,
       categoryStatus,
       imageUrl: o.imageUrl,
+      isTest: ctx.isTest,
       ...size,
     },
     slugify(o.title),
@@ -504,6 +506,7 @@ export async function importFeed(adapter: FeedAdapter, remote: RemoteFeed, trigg
     const previouslyActive = existingRows.filter((r) => r.active).length;
 
     const ctx = {
+      isTest: adapter.isTest,
       categoryIds: await loadCategoryIds(),
       productSizes: new Map<number, ProductSize>(),
       summary,

@@ -2,11 +2,13 @@ import { sql } from "drizzle-orm";
 import {
   bigserial,
   boolean,
+  date,
   doublePrecision,
   index,
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   real,
   serial,
   text,
@@ -160,8 +162,10 @@ export const product = pgTable(
     sizeSource: text("size_source"),
     /** ok | review | none */
     sizeStatus: text("size_status").notNull().default("none"),
-    /** Image URL from an allowed feed (served via our own proxy later, never hot-linked) */
+    /** Image URL from an allowed feed (served via our own proxy /img/p/[id], never hot-linked) */
     imageUrl: text("image_url"),
+    /** Created from a test network; hidden publicly, deleted when test mode is off */
+    isTest: boolean("is_test").notNull().default(false),
     createdAt: ts("created_at").notNull().defaultNow(),
     updatedAt: ts("updated_at").notNull().defaultNow(),
   },
@@ -273,4 +277,70 @@ export const matchReview = pgTable(
       .where(sql`status = 'open' and product_id is not null`),
     index("match_review_status_idx").on(t.status, t.kind),
   ],
+);
+
+// ---------------------------------------------------------------------------
+// Statistics (recomputed by the worker after imports)
+// ---------------------------------------------------------------------------
+
+/** Best total price (price + shipping) per product, country and calendar day (Europe/Vienna). */
+export const productDaily = pgTable(
+  "product_daily",
+  {
+    productId: integer("product_id")
+      .notNull()
+      .references(() => product.id, { onDelete: "cascade" }),
+    country: text("country").notNull(),
+    day: date("day", { mode: "string" }).notNull(),
+    bestCents: integer("best_cents").notNull(),
+    offerCount: integer("offer_count").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.productId, t.country, t.day] })],
+);
+
+/** Current numbers per product and country for lists, deals and "lowest since" notes. */
+export const productStats = pgTable(
+  "product_stats",
+  {
+    productId: integer("product_id")
+      .notNull()
+      .references(() => product.id, { onDelete: "cascade" }),
+    country: text("country").notNull(),
+    /** Cheapest available, non-suspect total right now */
+    bestCents: integer("best_cents").notNull(),
+    bestOfferId: integer("best_offer_id").notNull(),
+    bestUnitPriceCents: integer("best_unit_price_cents"),
+    offerCount: integer("offer_count").notNull(),
+    /** Median of daily best totals of the last 30 days (before today) */
+    median30Cents: integer("median30_cents"),
+    /** Days with data in the last 30 days (before today) */
+    days30: integer("days30").notNull().default(0),
+    /** Best total of the most recent earlier day */
+    prevBestCents: integer("prev_best_cents"),
+    prevBestDay: date("prev_best_day", { mode: "string" }),
+    min90Cents: integer("min90_cents"),
+    /** Days since the last day that was cheaper than now; null = never cheaper */
+    lowestSinceDays: integer("lowest_since_days"),
+    /** Days with data before today */
+    historyDays: integer("history_days").notNull().default(0),
+    checkedAt: timestamp("checked_at", { withTimezone: true }).notNull(),
+    computedAt: timestamp("computed_at", { withTimezone: true }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.productId, t.country] }), index("product_stats_country_idx").on(t.country)],
+);
+
+/** Outgoing clicks, aggregated per day. No IP address, no user id, no cookie. */
+export const clickStat = pgTable(
+  "click_stat",
+  {
+    day: date("day", { mode: "string" }).notNull(),
+    offerId: integer("offer_id")
+      .notNull()
+      .references(() => offer.id, { onDelete: "cascade" }),
+    country: text("country").notNull(),
+    /** web | mail | discord | push | pinterest | telegram … (from utm_source, whitelisted) */
+    source: text("source").notNull(),
+    clicks: integer("clicks").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.day, t.offerId, t.source] })],
 );

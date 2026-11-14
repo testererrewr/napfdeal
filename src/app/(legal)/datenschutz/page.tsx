@@ -74,6 +74,25 @@ export default function DatenschutzPage() {
         <Link href="/cookies-und-speicher/">Cookies &amp; Speicher</Link>.
       </p>
 
+      <h2>Klick auf einen Werbelink</h2>
+      <p>
+        Alle Links zu Shops führen zuerst über napfdeal.com (Adressen wie /go/123/) und leiten dich dann zum Shop bzw.
+        zum Partnernetzwerk weiter. Dabei zählen wir nur: welches Angebot, an welchem Tag, in welchem Land und aus
+        welchem Bereich (z. B. Website oder E-Mail) geklickt wurde. Wir speichern dabei weder deine IP-Adresse noch eine
+        Kennung von dir. Zweck ist die Abrechnung und Verbesserung des Angebots (Art. 6 Abs. 1 lit. f DSGVO).
+      </p>
+      <p>
+        Nach der Weiterleitung bist du beim Partnernetzwerk (zum Beispiel Awin AG, Deutschland) und beim Shop. Diese
+        verarbeiten deine Daten in eigener Verantwortung, etwa um die Provision zuzuordnen, und können dafür Cookies
+        setzen. Es gelten deren Datenschutzhinweise.
+      </p>
+
+      <h2>Produktbilder</h2>
+      <p>
+        Produktbilder laden wir auf unserem Server von den Shops und liefern sie selbst aus. Dein Browser nimmt dafür
+        keinen Kontakt zu den Shops auf.
+      </p>
+
       <h2>Kontakt per E-Mail</h2>
       <p>
         Wenn du uns schreibst, verarbeiten wir deine Nachricht und Adresse, um zu antworten (Art. 6 Abs. 1 lit. b oder f

@@ -12,16 +12,20 @@ import { ensureSeedCategories } from "@/lib/catalog";
 import { purgeTestData } from "@/lib/feeds/purge";
 import { activeAdapters, isTestMode } from "@/lib/feeds/registry";
 import { getSetting } from "@/lib/settings";
+import { recomputeStats } from "@/lib/stats";
 import { enqueueAllFeeds, enqueueChangedFeeds, FEED_QUEUES, type ImportJobData, runImportJob } from "./jobs/feeds";
 
 const TZ = process.env.JOB_TIMEZONE ?? "Europe/Vienna";
 const HEARTBEAT = "system.heartbeat";
+const STATS = "stats.recompute";
 
 async function applySchedules(boss: PgBoss): Promise<void> {
   // schedule() upserts, so calling it again picks up changed settings.
   await boss.schedule(FEED_QUEUES.refresh, await getSetting("jobs.fullRefreshCron"), { trigger: "full" }, { tz: TZ });
   await boss.schedule(FEED_QUEUES.check, await getSetting("jobs.feedCheckCron"), {}, { tz: TZ });
   await boss.schedule(HEARTBEAT, "*/15 * * * *", {}, { tz: TZ });
+  // New calendar day → yesterday becomes history, "lowest since" and medians shift.
+  await boss.schedule(STATS, "20 0 * * *", {}, { tz: TZ });
 }
 
 async function main() {
@@ -39,7 +43,7 @@ async function main() {
   boss.on("error", (err) => console.error("[worker] pg-boss error:", err.message));
   await boss.start();
 
-  for (const q of [HEARTBEAT, FEED_QUEUES.check, FEED_QUEUES.refresh, FEED_QUEUES.import]) {
+  for (const q of [HEARTBEAT, STATS, FEED_QUEUES.check, FEED_QUEUES.refresh, FEED_QUEUES.import]) {
     await boss.createQueue(q);
   }
   await applySchedules(boss);
@@ -61,7 +65,16 @@ async function main() {
 
   // One import at a time keeps DB load low and stays far below Awin's 5 concurrent downloads.
   await boss.work<ImportJobData>(FEED_QUEUES.import, async ([job]) => {
-    if (job) await runImportJob(job.data);
+    if (!job) return;
+    await runImportJob(job.data);
+    // Recompute statistics once the last queued import is done.
+    if ((await boss.getQueueSize(FEED_QUEUES.import)) === 0) await boss.send(STATS, {});
+  });
+
+  await boss.work(STATS, async () => {
+    const t = Date.now();
+    const r = await recomputeStats();
+    console.log(`[stats] ${r.products} product/country rows in ${Date.now() - t} ms`);
   });
 
   const networks = activeAdapters().map((a) => a.network);

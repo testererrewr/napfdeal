@@ -16,6 +16,14 @@ const entries = [
     content: "„de“ oder „at“",
     duration: "Bis du ihn im Browser löschst",
   },
+  {
+    name: "napfdeal_vorschau",
+    type: "Cookie (nur Betreiber)",
+    purpose:
+      "Schaltet für den Betreiber eine Vorschau mit Testdaten frei. Wird nur über einen geheimen Link gesetzt; normale Besucher bekommen ihn nie.",
+    content: "Geheimer Vorschau-Schlüssel",
+    duration: "30 Tage",
+  },
 ];
 
 export default function CookiesPage() {
@@ -23,8 +31,9 @@ export default function CookiesPage() {
     <>
       <h1 className="text-4xl">Cookies &amp; Speicher</h1>
       <p>
-        napfdeal setzt derzeit <strong>keine Cookies</strong>. Wir nutzen nur einen Eintrag im lokalen Speicher deines
-        Browsers, der für die Länderwahl technisch notwendig ist. Deshalb gibt es auch kein Cookie-Banner.
+        napfdeal setzt bei Besucherinnen und Besuchern derzeit <strong>keine Cookies</strong>. Wir nutzen nur einen
+        Eintrag im lokalen Speicher deines Browsers, der für die Länderwahl technisch notwendig ist. Deshalb gibt es auch
+        kein Cookie-Banner.
       </p>
 
       <h2>Alle Einträge</h2>

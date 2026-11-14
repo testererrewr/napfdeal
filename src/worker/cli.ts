@@ -2,13 +2,16 @@
  * Small admin CLI inside the worker image.
  *   docker compose exec worker node dist/worker/cli.mjs refresh      → import all feeds now
  *   docker compose exec worker node dist/worker/cli.mjs status       → last imports + counts
+ *   docker compose exec worker node dist/worker/cli.mjs stats        → recompute deal statistics
  *   docker compose exec worker node dist/worker/cli.mjs purge-test   → delete test data
+ *   docker compose exec worker node dist/worker/cli.mjs test-history → 60 days of made-up history, TEST products only
  */
 import { desc, sql } from "drizzle-orm";
 import PgBoss from "pg-boss";
 import { getDb, getSql } from "@/lib/db";
 import { feedImportRun, matchReview } from "@/lib/db/schema";
 import { purgeTestData } from "@/lib/feeds/purge";
+import { recomputeStats } from "@/lib/stats";
 import { FEED_QUEUES } from "./jobs/feeds";
 
 async function count(query: "products" | "offers" | "active_offers" | "history"): Promise<number> {
@@ -60,11 +63,28 @@ async function main() {
     console.log("Import aller Feeds angestoßen. Fortschritt: docker compose logs -f worker");
   } else if (cmd === "status") {
     await status();
+  } else if (cmd === "stats") {
+    const r = await recomputeStats();
+    console.log(`Statistik neu berechnet: ${r.products} Produkt/Land-Zeilen`);
+  } else if (cmd === "test-history") {
+    // Only for the preview with test data: fills product_daily for is_test products with a
+    // deterministic, made-up 60-day history so charts and deal logic can be checked.
+    const res = await getSql()`
+      insert into product_daily (product_id, country, day, best_cents, offer_count)
+      select ps.product_id, ps.country, (now() at time zone 'Europe/Vienna')::date - g.d,
+             (ps.best_cents * (1.0 + 0.08 + 0.12 * ((ps.product_id * 7 + g.d * 13) % 10) / 10.0))::int, ps.offer_count
+      from product_stats ps
+      join product p on p.id = ps.product_id and p.is_test
+      cross join generate_series(1, 60) as g(d)
+      on conflict (product_id, country, day) do nothing
+      returning product_id`;
+    const r = await recomputeStats();
+    console.log(`Test-Verlauf angelegt: ${res.length} Tageswerte (nur Testprodukte). Statistik: ${r.products} Zeilen.`);
   } else if (cmd === "purge-test") {
     const r = await purgeTestData();
     console.log(`Testdaten gelöscht: ${r.offers} Angebote, ${r.products} Produkte`);
   } else {
-    console.log("Befehle: refresh | status | purge-test");
+    console.log("Befehle: refresh | status | stats | test-history | purge-test");
     process.exitCode = 1;
   }
   await getSql().end();
