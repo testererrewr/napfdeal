@@ -47,6 +47,11 @@ services:
     image: ${IMAGE_PREFIX}/web:${IMAGE_TAG:-latest}
     depends_on:
       migrate: { condition: service_completed_successfully }
+    # Only reachable from the server itself (127.0.0.1), never from outside.
+    # The server's existing reverse proxy forwards napfdeal.com to this port.
+    # Change WEB_PORT in .env if the port is taken.
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3100}:3000"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
@@ -54,7 +59,10 @@ services:
       retries: 3
       start_period: 20s
 
+  # Own Caddy with automatic HTTPS. ONLY for a server where ports 80/443 are free.
+  # Disabled by default; enable with COMPOSE_PROFILES=caddy in .env.
   caddy:
+    profiles: ["caddy"]
     image: caddy:2-alpine
     restart: unless-stopped
     ports:

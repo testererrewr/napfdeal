@@ -1,0 +1,12 @@
+# Example for a server that already runs Caddy on 80/443.
+# Append this to the existing Caddyfile, then: caddy reload (or systemctl reload caddy).
+# No "log" directive on purpose (data minimisation).
+
+napfdeal.com {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3100
+}
+
+www.napfdeal.com {
+	redir https://napfdeal.com{uri} permanent
+}

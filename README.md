@@ -82,12 +82,18 @@ Alle Befehle als `root` auf dem VPS (`ssh root@159.195.109.20`).
 apt update && apt full-upgrade -y
 apt install -y ca-certificates curl git gnupg rsync ufw unattended-upgrades
 dpkg-reconfigure -plow unattended-upgrades   # automatische Sicherheitsupdates: "Ja"
+```
 
+> **Server mit anderen Diensten:** Eine Firewall mit `default deny` sperrt alle Ports, die nicht ausdrücklich
+> erlaubt sind. Vorher mit `ss -tlnp` nachsehen, welche Ports deine anderen Dienste brauchen, und die mit
+> `ufw allow PORT/tcp` freigeben, **bevor** du `ufw enable` ausführst. napfdeal selbst braucht keinen offenen Port.
+
+```bash
 ufw default deny incoming
 ufw allow OpenSSH
 ufw allow 80/tcp
 ufw allow 443/tcp
-ufw allow 443/udp
+# ufw allow <weitere Ports deiner anderen Dienste>
 ufw enable
 ```
 
@@ -154,6 +160,20 @@ openssl rand -base64 48 > /root/.napfdeal-backup-pass
 chmod 600 /root/.napfdeal-backup-pass
 cat /root/.napfdeal-backup-pass
 ```
+
+### 3.5b Reverse Proxy: Server teilt sich 80/443 mit anderen Diensten
+
+napfdeal läuft standardmäßig **ohne** eigenen Proxy. Die App hört nur auf `127.0.0.1:3100`
+(von außen nicht erreichbar, Port über `WEB_PORT` in `.env` änderbar). Der Proxy, der auf deinem Server
+schon 80/443 belegt, leitet `napfdeal.com` dorthin weiter:
+
+| Vorhandener Proxy | Vorlage                         |
+|-------------------|---------------------------------|
+| nginx             | `deploy/nginx-napfdeal.conf` (+ `certbot --nginx`) |
+| Caddy             | `deploy/Caddyfile.snippet`      |
+
+Belegt nichts die Ports 80/443, kann napfdeal seinen eigenen Caddy mitbringen: in `.env`
+`COMPOSE_PROFILES=caddy` setzen.
 
 ### 3.6 Starten und Autostart
 
