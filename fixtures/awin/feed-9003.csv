@@ -1,0 +1,5 @@
+aw_product_id,merchant_product_id,product_name,brand_name,aw_deep_link,merchant_image_url,aw_image_url,merchant_category,category_name,search_price,currency,delivery_cost,ean,product_GTIN,upc,in_stock,stock_status,base_price_text
+3001,M3001,TESTDATEN Testmarke Adult Huhn 12kg,Testmarke,https://example.com/testdaten/3001,,,Hundefutter,,44.49,EUR,0,2000000000015,,,1,,
+3002,M3002,TESTDATEN Testmarke Rind Nassfutter 6x400g,Testmarke,https://example.com/testdaten/3002,,,Hundefutter > Dosen,,10.99,EUR,4.90,2000000000022,,,1,,
+3003,M3003,"TESTDATEN Testmarke - Kauknochen, 24 Stück",Testmarke,https://example.com/testdaten/3003,,,Hund > Leckerli,,9.49,EUR,4.90,,,,1,,
+3004,M3004,TESTDATEN Testmarke Futter für Hunde und Katzen 2 kg,Testmarke,https://example.com/testdaten/3004,,,Tierfutter,,12.99,EUR,4.90,,,,1,,

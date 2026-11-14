@@ -72,7 +72,7 @@ export default async function TodayPage({ params }: Props) {
               {ANIMALS.map((a) => (
                 <li key={a.slug} className="border-b border-dashed border-line py-2">
                   <span className="font-serif text-lg">{a.name}</span>
-                  {"note" in a ? <span className="block text-xs text-ink-soft">{a.note}</span> : null}
+                  {a.note ? <span className="block text-xs text-ink-soft">{a.note}</span> : null}
                 </li>
               ))}
             </ul>

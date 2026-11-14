@@ -45,6 +45,7 @@ ENV NODE_ENV=production
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist/worker ./dist/worker
 COPY --from=build --chown=node:node /app/drizzle ./drizzle
+COPY --from=build --chown=node:node /app/fixtures ./fixtures
 COPY --chown=node:node package.json ./
 USER node
 CMD ["node", "dist/worker/index.mjs"]

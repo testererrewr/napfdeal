@@ -1,7 +1,9 @@
-// Seed list for animal categories. In Phase 1 this moves into the database
-// (editable in /admin); this file then only provides the initial seed.
+// Seed for categories. The database is the source of truth (editable in /admin later);
+// the worker inserts missing seed rows on start and never overwrites admin changes.
 
-export const ANIMALS = [
+import type { AnimalSlug, SubcategorySlug } from "@/lib/pricing/classify";
+
+export const ANIMALS: ReadonlyArray<{ slug: AnimalSlug; name: string; note?: string }> = [
   { slug: "hund", name: "Hund" },
   { slug: "katze", name: "Katze" },
   { slug: "kleintiere", name: "Kleintiere", note: "Kaninchen, Meerschweinchen, Hamster und mehr" },
@@ -10,9 +12,9 @@ export const ANIMALS = [
   { slug: "terraristik", name: "Terraristik" },
   { slug: "pferd", name: "Pferd" },
   { slug: "sonstiges", name: "Sonstiges" },
-] as const;
+];
 
-export const SUBCATEGORIES = [
+export const SUBCATEGORIES: ReadonlyArray<{ slug: SubcategorySlug; name: string }> = [
   { slug: "trockenfutter", name: "Trockenfutter" },
   { slug: "nassfutter", name: "Nassfutter" },
   { slug: "snacks", name: "Snacks" },
@@ -21,4 +23,4 @@ export const SUBCATEGORIES = [
   { slug: "zubehoer", name: "Zubehör" },
   { slug: "pflege", name: "Pflege" },
   { slug: "gesundheit", name: "Gesundheit" },
-] as const;
+];

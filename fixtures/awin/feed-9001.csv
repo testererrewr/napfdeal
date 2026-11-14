@@ -1,0 +1,8 @@
+aw_product_id,merchant_product_id,product_name,brand_name,aw_deep_link,merchant_image_url,aw_image_url,merchant_category,category_name,search_price,currency,delivery_cost,ean,product_GTIN,upc,in_stock,stock_status,base_price_text
+1001,M1001,TESTDATEN Testmarke Adult Huhn Trockenfutter 12 kg,Testmarke,https://example.com/testdaten/1001,,,Hund > Trockenfutter,,42.99,EUR,0,2000000000015,,,1,,
+1002,M1002,TESTDATEN Testmarke Nassfutter Rind 6 x 400 g,Testmarke,https://example.com/testdaten/1002,,,Hund > Nassfutter,,11.49,EUR,3.95,2000000000022,,,1,,
+1003,M1003,TESTDATEN Testmarke Klumpstreu 10 l,Testmarke,https://example.com/testdaten/1003,,,Katze > Katzenstreu,,8.99,EUR,3.95,2000000000039,,,1,,
+1004,M1004,"TESTDATEN Probenapf Edelstahl Napf 1,2 l",Probenapf,https://example.com/testdaten/1004,,,Hund > Näpfe,,14.90,EUR,3.95,2000000000046,,,1,,
+1005,M1005,TESTDATEN Testmarke Kauknochen 24 Stück,Testmarke,https://example.com/testdaten/1005,,,Hund > Snacks,,9.99,EUR,3.95,,,,1,,
+1006,M1006,TESTDATEN Testmarke Geschirr für Hunde 10-25 kg,Testmarke,https://example.com/testdaten/1006,,,Hund > Geschirre,,24.99,EUR,0,2000000000053,,,1,,
+1007,M1007,TESTDATEN Zeile ohne Link (wird übersprungen),Testmarke,,,,,,5.00,EUR,0,,,,1,,

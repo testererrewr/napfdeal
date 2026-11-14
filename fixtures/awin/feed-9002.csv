@@ -1,0 +1,4 @@
+aw_product_id,merchant_product_id,product_name,brand_name,aw_deep_link,merchant_image_url,aw_image_url,merchant_category,category_name,search_price,currency,delivery_cost,ean,product_GTIN,upc,in_stock,stock_status,base_price_text
+2001,M2001,TESTDATEN Testmarke Adult Huhn Trockenfutter 12 kg,Testmarke,https://example.com/testdaten/2001,,,Hund > Trockenfutter,,45.99,EUR,0,2000000000015,,,1,,
+2002,M2002,TESTDATEN Testmarke Klumpstreu 10 l,Testmarke,https://example.com/testdaten/2002,,,Katze > Streu,,9.49,EUR,4.90,2000000000039,,,1,,
+2003,M2003,TESTDATEN Testmarke Katzenfutter mit Fisch 12 x 85 g,Testmarke,https://example.com/testdaten/2003,,,Katze > Nassfutter,,8.79,EUR,4.90,2000000000060,,,0,,

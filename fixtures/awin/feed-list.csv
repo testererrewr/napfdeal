@@ -1,0 +1,5 @@
+Advertiser ID,Advertiser Name,Primary Region,Membership Status,Feed ID,Feed Name,Language,Vertical,Last Imported,Last Checked,No of products,URL
+90001,Testshop Nord (Testdaten),DE,active,9001,Testshop Nord Produkte,de,Pets,2026-11-14 05:00:00,2026-11-14 05:10:00,7,
+90002,Testshop Süd (Testdaten),AT,active,9002,Testshop Süd Produkte,de,Pets,2026-11-14 05:00:00,2026-11-14 05:10:00,3,
+90003,Testshop Mitte (Testdaten),DE,active,9003,Testshop Mitte Produkte,de,Pets,2026-11-14 05:00:00,2026-11-14 05:10:00,4,
+90004,Testshop Pause (Testdaten),DE,pending,9004,Nicht freigeschaltet,de,Pets,,,0,

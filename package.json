@@ -9,13 +9,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:worker": "esbuild src/worker/index.ts src/worker/migrate.ts --bundle --platform=node --target=node22 --format=esm --packages=external --outdir=dist/worker --out-extension:.js=.mjs",
+    "build:worker": "esbuild src/worker/index.ts src/worker/migrate.ts src/worker/cli.ts --bundle --platform=node --target=node22 --format=esm --packages=external --outdir=dist/worker --out-extension:.js=.mjs",
     "start": "next start",
     "worker:dev": "tsx watch src/worker/index.ts",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/worker/migrate.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "test": "node --test \"src/**/*.test.ts\""
   },
   "dependencies": {
     "drizzle-orm": "^0.44.0",

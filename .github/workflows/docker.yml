@@ -1,4 +1,6 @@
-# Builds the web and worker images and pushes them to GitHub Container Registry (private with a private repo).
+# 1. prepare: install, unit tests, generate DB migrations (drizzle-kit) and the lockfile,
+#    commit them back to main if they changed.
+# 2. build:   build web + worker images from that commit and push them to GHCR (private).
 # The server only pulls finished images – nothing is compiled on the VPS.
 name: Build images
 
@@ -7,22 +9,60 @@ on:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  packages: write
-
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Generate database migrations
+        run: npx drizzle-kit generate
+
+      - name: Commit generated files
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json drizzle
+          if git diff --cached --quiet; then
+            echo "No generated changes."
+          else
+            git commit -m "chore: generated lockfile and migrations [skip ci]"
+            git push
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         target: [web, worker]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
 
       - name: Image name (lowercase)
         run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}/${{ matrix.target }}" >> "$GITHUB_ENV"
@@ -43,7 +83,7 @@ jobs:
           platforms: linux/amd64
           tags: |
             ${{ env.IMAGE }}:latest
-            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:${{ needs.prepare.outputs.sha }}
           build-args: |
             NEXT_PUBLIC_SITE_URL=https://napfdeal.com
           cache-from: type=gha,scope=${{ matrix.target }}
