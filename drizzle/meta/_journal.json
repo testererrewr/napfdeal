@@ -15,6 +15,13 @@
       "when": 1794686844820,
       "tag": "0001_smiling_lionheart",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794742808999,
+      "tag": "0002_real_vulcan",
+      "breakpoints": true
     }
   ]
 }
