@@ -28,7 +28,8 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+        # npm install (not ci): updates the lockfile when package.json changed; the result is committed below.
+        run: npm install --no-audit --no-fund
 
       - name: Unit tests
         run: npm test

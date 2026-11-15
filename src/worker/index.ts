@@ -12,12 +12,14 @@ import { ensureSeedCategories } from "@/lib/catalog";
 import { purgeTestData } from "@/lib/feeds/purge";
 import { activeAdapters, isTestMode } from "@/lib/feeds/registry";
 import { getSetting } from "@/lib/settings";
+import { runRetention } from "@/lib/retention";
 import { recomputeStats } from "@/lib/stats";
 import { enqueueAllFeeds, enqueueChangedFeeds, FEED_QUEUES, type ImportJobData, runImportJob } from "./jobs/feeds";
 
 const TZ = process.env.JOB_TIMEZONE ?? "Europe/Vienna";
 const HEARTBEAT = "system.heartbeat";
 const STATS = "stats.recompute";
+const RETENTION = "maintenance.retention";
 
 async function applySchedules(boss: PgBoss): Promise<void> {
   // schedule() upserts, so calling it again picks up changed settings.
@@ -26,6 +28,8 @@ async function applySchedules(boss: PgBoss): Promise<void> {
   await boss.schedule(HEARTBEAT, "*/15 * * * *", {}, { tz: TZ });
   // New calendar day → yesterday becomes history, "lowest since" and medians shift.
   await boss.schedule(STATS, "20 0 * * *", {}, { tz: TZ });
+  // Deletion deadlines (unconfirmed alerts after 48 h, expired links …)
+  await boss.schedule(RETENTION, "35 * * * *", {}, { tz: TZ });
 }
 
 async function main() {
@@ -43,7 +47,7 @@ async function main() {
   boss.on("error", (err) => console.error("[worker] pg-boss error:", err.message));
   await boss.start();
 
-  for (const q of [HEARTBEAT, STATS, FEED_QUEUES.check, FEED_QUEUES.refresh, FEED_QUEUES.import]) {
+  for (const q of [HEARTBEAT, STATS, RETENTION, FEED_QUEUES.check, FEED_QUEUES.refresh, FEED_QUEUES.import]) {
     await boss.createQueue(q);
   }
   await applySchedules(boss);
@@ -69,6 +73,12 @@ async function main() {
     await runImportJob(job.data);
     // Recompute statistics once the last queued import is done.
     if ((await boss.getQueueSize(FEED_QUEUES.import)) === 0) await boss.send(STATS, {});
+  });
+
+  await boss.work(RETENTION, async () => {
+    const r: Record<string, number> = await runRetention();
+    const total = Object.values(r).reduce((a: number, b: number) => a + b, 0);
+    if (total > 0) console.log(`[retention] deleted ${Object.entries(r).map(([k, v]) => `${k}=${v}`).join(" ")}`);
   });
 
   await boss.work(STATS, async () => {

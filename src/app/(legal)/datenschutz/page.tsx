@@ -19,7 +19,7 @@ export default function DatenschutzPage() {
       <h2>Kurz gesagt</h2>
       <ul>
         <li>Keine Tracker, keine Werbeskripte, keine Analyse-Dienste.</li>
-        <li>Keine Cookies. Nur deine Länderwahl liegt im Speicher deines Browsers.</li>
+        <li>Keine Cookies, solange du dich nicht anmeldest. Deine Länderwahl liegt nur im Speicher deines Browsers.</li>
         <li>Schriften und alle anderen Dateien kommen von unserem eigenen Server.</li>
         <li>Wir speichern keine IP-Adressen in Zugriffsprotokollen.</li>
       </ul>
@@ -74,6 +74,47 @@ export default function DatenschutzPage() {
         <Link href="/cookies-und-speicher/">Cookies &amp; Speicher</Link>.
       </p>
 
+      <h2>Konto</h2>
+      <p>
+        Wenn du ein Konto anlegst, speichern wir deine E-Mail-Adresse, dein Passwort (nur als Argon2id-Hash, nicht
+        lesbar), ob die Adresse bestätigt ist, dein gewähltes Land sowie deine Merklisten und Preis-Alarme. Für die
+        Anmeldung setzen wir ein Sitzungs-Cookie. IP-Adresse und Browserkennung speichern wir dabei nicht. Rechtsgrundlage
+        ist die Erfüllung des Nutzungsvertrags (Art. 6 Abs. 1 lit. b DSGVO). Wir speichern die Daten, bis du das Konto
+        löschst. Ein Konto ist ab 16 Jahren möglich.
+      </p>
+
+      <h3>Anmeldung mit Google oder Discord</h3>
+      <p>
+        Wählst du „Weiter mit Google“ oder „Weiter mit Discord“, leiten wir dich zu Google Ireland Limited (Gordon House,
+        Barrow Street, Dublin 4, Irland) bzw. Discord Netherlands BV (Schiphol Boulevard 195, 1118 BG Schiphol,
+        Niederlande) weiter. Wir erhalten nur deine E-Mail-Adresse, ob sie bestätigt ist, deinen Namen und eine Kennung
+        (Berechtigungen „openid email profile“ bzw. „identify email“). Ein Profilbild speichern wir nicht. Die Anbieter
+        können Daten in die USA übermitteln; beide berufen sich auf das EU-US Data Privacy Framework. Rechtsgrundlage ist
+        Art. 6 Abs. 1 lit. b DSGVO.
+      </p>
+      <span className="todo">TODO: rechtlich prüfen (Anbieter-Anschriften und Drittlandübermittlung aktuell halten).</span>
+
+      <h2>Preis-Alarm ohne Konto</h2>
+      <p>
+        Für einen Preis-Alarm ohne Konto speichern wir deine E-Mail-Adresse und die Bedingungen des Alarms. Jeder Alarm
+        wird erst aktiv, wenn du ihn über den Link in unserer Bestätigungsmail bestätigst (Double-Opt-in).
+        Unbestätigte Alarme löschen wir nach 48 Stunden, eine Adresse ohne Alarme ebenfalls. Rechtsgrundlage ist deine
+        Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit widerrufen kannst: Jede Mail enthält Links zum
+        Löschen eines Alarms und aller deiner Daten.
+      </p>
+      <p>
+        Gegen Missbrauch begrenzen wir, wie viele Alarme in kurzer Zeit angelegt werden. Dafür halten wir deine
+        IP-Adresse höchstens eine Stunde im Arbeitsspeicher, nie auf der Festplatte.
+      </p>
+
+      <h2>E-Mail-Versand</h2>
+      <p>
+        Bestätigungs- und Benachrichtigungsmails verschicken wir über Brevo (Sendinblue SAS, 106 boulevard Haussmann,
+        75008 Paris, Frankreich) als Auftragsverarbeiter. Brevo verarbeitet dafür deine E-Mail-Adresse und den Inhalt der
+        Mail. Unsere Mails enthalten keine Zählpixel.
+      </p>
+      <span className="todo">TODO: AV-Vertrag mit Brevo abschließen; Klick- und Öffnungs-Tracking im Brevo-Konto ausschalten.</span>
+
       <h2>Klick auf einen Werbelink</h2>
       <p>
         Alle Links zu Shops führen zuerst über napfdeal.com (Adressen wie /go/123/) und leiten dich dann zum Shop bzw.
@@ -117,8 +158,8 @@ export default function DatenschutzPage() {
 
       <h2>Was noch dazukommt</h2>
       <p>
-        Sobald es Konten, Preis-Alarme, Benachrichtigungen und Links zu Shops gibt, ergänzen wir diese Erklärung vor dem
-        Start der jeweiligen Funktion.
+        Benachrichtigungen über Discord und Browser-Push sowie Datenexport und Löschen per Klick ergänzen wir hier, bevor
+        die jeweilige Funktion startet.
       </p>
     </>
   );

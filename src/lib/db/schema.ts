@@ -344,3 +344,174 @@ export const clickStat = pgTable(
   },
   (t) => [primaryKey({ columns: [t.day, t.offerId, t.source] })],
 );
+
+// ---------------------------------------------------------------------------
+// Accounts (tables in the shape Better Auth expects; keys = model field names)
+// ---------------------------------------------------------------------------
+export const user = pgTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  image: text("image"),
+  /** de | at – preferred country edition */
+  country: text("country"),
+  /** user | admin */
+  role: text("role").notNull().default("user"),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+});
+
+export const session = pgTable(
+  "session",
+  {
+    id: text("id").primaryKey(),
+    expiresAt: ts("expires_at").notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+    /** Always null: stripped in a database hook (no IP addresses stored) */
+    ipAddress: text("ip_address"),
+    /** Always null: stripped in a database hook */
+    userAgent: text("user_agent"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  },
+  (t) => [index("session_user_idx").on(t.userId)],
+);
+
+export const account = pgTable(
+  "account",
+  {
+    id: text("id").primaryKey(),
+    accountId: text("account_id").notNull(),
+    /** credential | google | discord */
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: ts("access_token_expires_at"),
+    refreshTokenExpiresAt: ts("refresh_token_expires_at"),
+    scope: text("scope"),
+    /** Argon2id PHC string for providerId = credential */
+    password: text("password"),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    updatedAt: ts("updated_at").notNull().defaultNow(),
+  },
+  (t) => [index("account_user_idx").on(t.userId)],
+);
+
+export const verification = pgTable(
+  "verification",
+  {
+    id: text("id").primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: ts("expires_at").notNull(),
+    createdAt: ts("created_at").defaultNow(),
+    updatedAt: ts("updated_at").defaultNow(),
+  },
+  (t) => [index("verification_identifier_idx").on(t.identifier)],
+);
+
+// ---------------------------------------------------------------------------
+// Guests (price alerts without an account)
+// ---------------------------------------------------------------------------
+export const guest = pgTable("guest", {
+  id: serial("id").primaryKey(),
+  /** lower-case */
+  email: text("email").notNull().unique(),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  lastActiveAt: ts("last_active_at").notNull().defaultNow(),
+});
+
+/**
+ * One-time / time-limited links (alert confirmation, guest management, one-click delete …).
+ * Only the SHA-256 hash of the token is stored.
+ */
+export const accessToken = pgTable(
+  "access_token",
+  {
+    id: serial("id").primaryKey(),
+    hash: text("hash").notNull().unique(),
+    /** alert_confirm | guest_manage | alert_delete | data_delete */
+    kind: text("kind").notNull(),
+    guestId: integer("guest_id").references(() => guest.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+    alertId: integer("alert_id"),
+    expiresAt: ts("expires_at").notNull(),
+    usedAt: ts("used_at"),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("access_token_expires_idx").on(t.expiresAt)],
+);
+
+// ---------------------------------------------------------------------------
+// Price alerts and watchlists
+// ---------------------------------------------------------------------------
+export const alert = pgTable(
+  "alert",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+    guestId: integer("guest_id").references(() => guest.id, { onDelete: "cascade" }),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => product.id, { onDelete: "cascade" }),
+    /** Only shops of this country are checked */
+    country: text("country").notNull(),
+    /** target (desired price) | drop (every drop above a threshold) */
+    kind: text("kind").notNull(),
+    targetCents: integer("target_cents"),
+    includeShipping: boolean("include_shipping").notNull().default(true),
+    minDropPercent: real("min_drop_percent").notNull().default(3),
+    minDropCents: integer("min_drop_cents").notNull().default(50),
+    backInStock: boolean("back_in_stock").notNull().default(false),
+    /** one daily summary instead of single messages */
+    digest: boolean("digest").notNull().default(false),
+    /** email | discord | push */
+    channels: text("channels").array().notNull().default(sql`'{email}'::text[]`),
+    /** pending (guest, not confirmed) | active | paused */
+    status: text("status").notNull().default("pending"),
+    confirmedAt: ts("confirmed_at"),
+    lastNotifiedAt: ts("last_notified_at"),
+    lastNotifiedCents: integer("last_notified_cents"),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [
+    index("alert_user_idx").on(t.userId),
+    index("alert_guest_idx").on(t.guestId),
+    index("alert_product_country_idx").on(t.productId, t.country),
+  ],
+);
+
+export const watchlist = pgTable(
+  "watchlist",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("watchlist_user_idx").on(t.userId)],
+);
+
+export const watchlistItem = pgTable(
+  "watchlist_item",
+  {
+    watchlistId: integer("watchlist_id")
+      .notNull()
+      .references(() => watchlist.id, { onDelete: "cascade" }),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => product.id, { onDelete: "cascade" }),
+    addedAt: ts("added_at").notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.watchlistId, t.productId] })],
+);

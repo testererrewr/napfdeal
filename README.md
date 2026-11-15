@@ -275,6 +275,47 @@ Wird ab Phase 3 gebraucht. Absender muss eine Adresse **@napfdeal.com** sein (ni
 
 ---
 
+## 7b. Konten: Secret, Google- und Discord-Login
+
+**Pflicht** (ohne das startet die Anmeldung nicht):
+
+```bash
+cd /opt/napfdeal
+grep -q '^BETTER_AUTH_SECRET=.' .env || sed -i "s|^BETTER_AUTH_SECRET=.*|BETTER_AUTH_SECRET=$(openssl rand -base64 32)|" .env
+grep -q '^BETTER_AUTH_SECRET=' .env || echo "BETTER_AUTH_SECRET=$(openssl rand -base64 32)" >> .env
+docker compose up -d
+```
+
+Registrierung mit E-Mail braucht funktionierenden Mailversand (Abschnitt 7).
+
+### Google (optional)
+
+1. https://console.cloud.google.com → neues Projekt „napfdeal“.
+2. **APIs & Dienste → OAuth-Zustimmungsbildschirm**: Typ „Extern“, App-Name „napfdeal“, Support-Mail, Logo (optional),
+   App-Startseite `https://napfdeal.com`, Datenschutz `https://napfdeal.com/datenschutz/`,
+   Nutzungsbedingungen `https://napfdeal.com/nutzungsbedingungen/`, autorisierte Domain `napfdeal.com`.
+   Bereiche (Scopes): nur `openid`, `email`, `profile`. Danach **App veröffentlichen** (für diese Scopes ohne Google-Prüfung).
+3. **Anmeldedaten → Anmeldedaten erstellen → OAuth-Client-ID**, Typ „Webanwendung“.
+   - Autorisierte JavaScript-Quelle: `https://napfdeal.com`
+   - Autorisierte Weiterleitungs-URI: `https://napfdeal.com/api/auth/callback/google`
+4. Client-ID und Clientschlüssel in `.env` → `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, dann `docker compose up -d`.
+
+### Discord (optional)
+
+1. https://discord.com/developers/applications → **New Application** „napfdeal“.
+2. **General Information**: App-Icon, Beschreibung, Terms of Service URL `https://napfdeal.com/nutzungsbedingungen/`,
+   Privacy Policy URL `https://napfdeal.com/datenschutz/`.
+3. **OAuth2**: Redirect `https://napfdeal.com/api/auth/callback/discord` hinzufügen.
+   Scopes nutzt napfdeal nur `identify` und `email`.
+4. Client ID und Client Secret (Reset Secret) in `.env` → `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, dann `docker compose up -d`.
+
+Dieselbe Discord-Anwendung wird in Phase 4 auch die Discord-App für Preis-Alarme.
+
+Gleiche, bestätigte E-Mail-Adresse = gleiches Konto: Wer sich erst mit E-Mail registriert und später „Weiter mit Google“
+wählt, landet im selben Konto.
+
+---
+
 ## 8. Lokale Entwicklung
 
 ```bash

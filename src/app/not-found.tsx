@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 export default function NotFound() {
   return (
     <>
-      <SiteHeader />
+      <SiteHeader showAccount={false} />
       <main className="mx-auto max-w-[72rem] px-4 py-16 md:px-8">
         <Bowl className="h-20 w-20 text-ink-soft" />
         <h1 className="mt-4 text-4xl">Diese Seite gibt es nicht.</h1>

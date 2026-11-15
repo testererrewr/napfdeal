@@ -17,6 +17,21 @@ const entries = [
     duration: "Bis du ihn im Browser löschst",
   },
   {
+    name: "napfdeal.session_token",
+    type: "Cookie (nur nach Anmeldung)",
+    purpose: "Hält dich angemeldet. Wird nur gesetzt, wenn du dich in dein Konto einloggst. HttpOnly, nur über HTTPS.",
+    content: "Zufällige Sitzungskennung",
+    duration: "30 Tage oder bis zum Abmelden",
+  },
+  {
+    name: "napfdeal.* (weitere)",
+    type: "Cookie (nur bei Anmeldung)",
+    purpose:
+      "Kurzlebige Sicherheits-Cookies während der Anmeldung, z. B. zum Schutz vor gefälschten Anfragen bei „Weiter mit Google/Discord“.",
+    content: "Zufällige Prüfwerte",
+    duration: "Minuten, bis die Anmeldung abgeschlossen ist",
+  },
+  {
     name: "napfdeal_vorschau",
     type: "Cookie (nur Betreiber)",
     purpose:
@@ -62,10 +77,10 @@ export default function CookiesPage() {
         </table>
       </div>
 
-      <h2>Später dazukommend</h2>
+      <h2>Warum kein Cookie-Banner?</h2>
       <p>
-        Wenn du dich künftig einloggst, kommen ein Sitzungs-Cookie und ein Sicherheits-Token dazu. Beide sind technisch
-        notwendig und werden hier aufgeführt, bevor die Funktion startet.
+        Alle Einträge oben sind technisch notwendig für Funktionen, die du selbst auslöst (Länderwahl, Anmeldung). Dafür
+        braucht es keine Einwilligung. Sollten wir je etwas einsetzen, das eine Einwilligung braucht, fragen wir vorher.
       </p>
 
       <h2>Cookies von Shops</h2>

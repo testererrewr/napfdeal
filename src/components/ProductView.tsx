@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ProductActions } from "@/components/account/ProductActions";
 import { AdNotice, PriceDisclaimer } from "@/components/AdNotice";
 import { Breadcrumbs, type Crumb } from "@/components/Breadcrumbs";
 import { EmptyState, PriceTag, SectionHead } from "@/components/editorial";
@@ -61,6 +62,7 @@ export function ProductView({
   points,
   today,
   range,
+  savedTo,
 }: {
   country: Country;
   product: ProductDetail;
@@ -72,6 +74,7 @@ export function ProductView({
   points: DailyPoint[];
   today: string;
   range: ChartRange;
+  savedTo: string | null;
 }) {
   const path = productPath(country, p.categoryPath, p.slug);
   const best = offers.find((o) => o.available && !o.suspect) ?? null;
@@ -131,15 +134,13 @@ export function ProductView({
             </div>
           ) : null}
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <button type="button" disabled className="cursor-not-allowed rounded-sm border border-ink px-3 py-2 text-sm opacity-60">
-              Merken
-            </button>
-            <button type="button" disabled className="cursor-not-allowed rounded-sm border border-ink px-3 py-2 text-sm opacity-60">
-              Preis-Alarm
-            </button>
-            <span className="text-xs text-ink-soft">Merklisten und Preis-Alarm kommen bald.</span>
-          </div>
+          <ProductActions
+            productId={p.id}
+            country={country}
+            backPath={path}
+            bestCents={best?.totalCents ?? null}
+            savedTo={savedTo}
+          />
         </div>
       </div>
 

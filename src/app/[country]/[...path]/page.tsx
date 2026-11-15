@@ -124,6 +124,7 @@ export default async function CatalogPage({ params, searchParams }: Props) {
       points={points}
       today={today}
       range={range}
+      savedTo={one(sp.gemerkt) ?? null}
     />
   );
 }
